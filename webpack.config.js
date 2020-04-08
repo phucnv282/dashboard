@@ -11,7 +11,7 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/dist',
-		filename: 'map-view.bundle.js'
+		filename: 'dashboard.bundle.js'
 	},
 	module: {
 		rules: [{

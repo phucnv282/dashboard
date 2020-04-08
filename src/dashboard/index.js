@@ -1,4 +1,4 @@
-var componentName = "baseMap";
+var componentName = "dashboard";
 module.exports.name = componentName;
 require("./style.less");
 const queryString = require("query-string");
@@ -23,8 +23,6 @@ const BASE_URL = WI_BACKEND_HOST;
 localStorage.setItem('__BASE_URL', WI_AUTH_HOST);
 
 var app = angular.module(componentName, [
-  "mapView",
-  "googleMapView",
   "sideBar",
   "wiTreeView",
   "wiTreeViewVirtual",
@@ -1293,10 +1291,10 @@ function baseMapController(
     document.getElementById("main").classList.toggle("dark-mode");
     $(".dialog").toggleClass("dark-mode");
   }
-  this.setAllDone = function(param) {
-    console.log(param)
-    localStorage.setItem('all-done', param);
-  }
+  //this.setAllDone = function(param) {
+    //console.log(param)
+    //localStorage.setItem('all-done', param);
+  //}
   function setDarkMode(enable) {
     if (enable) {
       document.getElementById("main").classList.add("dark-mode");

@@ -1,36 +1,7 @@
-
-<div class="dialog-setting slim-scroller" ng-show="self.showZone">
-  ${require('./dialog-zone-utms.html')}
-</div>
-<div class="dialog-setting slim-scroller" ng-show="self.showAxesDialog" style="height: auto;">
-  ${require('./dialog-axes.html')}
-</div>
-<div class="dialog-setting slim-scroller" ng-show="self.showFileDialog" style="height: auto;">
-  ${require('./dialog-file.html')}
-</div>
 <script type="text/ng-template" id="dashboard-template-modal">
 ${require('./dashboard-template-modal.html')}
 </script> 
-<div ng-show="self.showGuide && !self.showMap"
-  style="width: calc(100vw - 340px); height: 100vh; right: 0; position: absolute; overflow: hidden; background: #3e84ff; z-index: 3;"
-  class="slim-scroller guide-mobile">
-  <div class="content" style="width: 300px; display: flex; top: 100px; left: 100px; position: absolute;">
-    <div class="icon-clicking"></div>
-    <div style="color: #fff; margin-left: 20px;">
-      <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">
-        Open Dashboard
-      </div>
-      <div>
-        Choose a project to get started.
-      </div>
-      <div ng-click="self.showGuide = !self.showGuide; self.setAllDone(true)"
-        style="display: flex; padding: 10px 20px; border-radius: 20px; border: 2px solid #fff; width: fit-content; align-items: center; margin-top: 40px; cursor: pointer;">
-        <div class="fa fa-check" style="margin-right: 15px;"></div>
-        <div>Done</div>
-      </div>
-    </div>
-  </div>
-</div>
+
 <div class="dialog-error" ng-show="self.showError">
     <div class="dialog-header">
         <div style="display: flex; align-items: center;">
@@ -49,8 +20,8 @@ ${require('./dashboard-template-modal.html')}
             {{ message || "Something error" }}
         </span>
     </div>
-    
 </div>
+
 <div class="dialog-error" ng-show="self.wellError">
   <div class="dialog-header">
       <div style="display: flex; align-items: center;">
@@ -497,77 +468,9 @@ ${require('./dashboard-template-modal.html')}
     </div>
   </div>
 </div>
-<div class="help" ng-click="self.showHelp = !self.showHelp" ng-show="self.showMap">
-  <i class="fa fa-question-circle" style="font-size: 18px;"></i>
-  <div class="help-content" ng-show="self.showHelp">
-    <div class="help-content-row">
-      <div class="well-icon"></div>
-      <span>Undefined</span>
-    </div>
-    <div class="help-content-row">
-      <div class="arrow" style="transform: rotate(180deg);"></div>
-      <span>Production</span>
-    </div>
-    <div class="help-content-row">
-      <div class="search"></div>
-      <span>Exploration</span>
-    </div>
-    <div class="help-content-row" style="border-bottom: 1px solid #e2e2e273; padding-bottom: 25px; margin-bottom: 15px;">
-      <div class="arrow" ></div>
-      <span>Injection</span>
-    </div>
-    <div class="help-content-row">
-      <div class="circle" style="background: #15b153;
-      border: 1px solid #8fd0ac;"></div>
-      <span>Oil</span>
-    </div>
-    <div class="help-content-row">
-      <div class="circle" style="background: #7d7d7d8a;
-      border: 1px solid #cccccc;"></div>
-      <span>Condensate</span>
-    </div>
-    <div class="help-content-row">
-      <div class="circle" style="background: #ff6868;
-      border: 1px solid #ffcece;"></div>
-      <span>Gas</span>
-    </div>
-    <div class="help-content-row">
-      <div class="circle" style="background: #0072ffa6;
-      border: 1px solid #9cd5fd;"></div>
-      <span>Water</span>
-    </div>
-    <div class="help-content-row">
-      <div class="circle" style="background: #585858;
-      border: 1px solid #9c9c9c;"></div>
-      <span>Undefined</span>
-    </div>
-  </div>
-</div>
 <div ng-class="{'show-dashboard': self.showDashboard}" class="dialog">
   ${require('./dialog-dashboard.html')}
 </div>
-<!-- <map-view 
-  ng-show="self.showMap"
-  class="mapView"
-  mapbox-token="pk.eyJ1IjoicmV2b3RlY2giLCJhIjoiY2swZGJobWg3MDY2NzNtbnVwaDEyYmttMCJ9.39KL2GsNCiew9XmiLVsTDQ"
-  wells="wellSelect" zone-map="zoneMap" focus-well='focusWell' all-popup="allPopup" theme="themeMap"
-  focus-curve="focusCurve" geo-json="self.geoJson"
-  focus-marker-or-zone="focusMZ" zone-depth-spec="self.zoneDepthSpec"
-  get-curve-info-fn="self.getCurveInfoFn" get-curve-raw-data-fn="self.getCurveRawDataFn"
-  show-contour="self.showContour" control-panel="self.controlPanel" deep-ocean="self.deepOcean" point="self.point">
-</map-view>
--->
-<google-map-view theme="themeMap" ng-if="checkGoogleApi() && self.showMap" all-popup="allPopup" class="mapView"
-  wells="wellSelect" geo-json="self.geoJson" control-panel="self.controlPanel" point="self.point" focus-well='focusWell'
-  focus-curve="focusCurve" show-contour="self.showContour" show-contour-text="self.showContourText"
-  contour-transparency="self.contourTransparency" contour-step="self.contourStep" show-contour-stroke="self.showContourStroke"
-  show-trajectory="self.showTrajectory" show-Axes="self.showAxes"
-  axes-unit="self.axesUnit" axes-x-left="self.XLeft" axes-x-right="self.XRight" axes-y-bottom="self.YBottom" axes-y-top="self.YTop"
-  focus-marker-or-zone="focusMZ" zone-depth-spec="self.zoneDepthSpec" get-curve-info-fn="self.getCurveInfoFn"
-  prepare-well-info-fn="self.prepareWellInfoFn" well-position="self.wellPosition" fit-to-bound="self.fitToBound"
-  get-curve-raw-data-fn="self.getCurveRawDataFn" zone-map="zoneMap" clear-clipboard-focus-well="self.clearClipboardFocusWell"
-  display-mode="self.wellDisplayMode">
-</google-map-view>
 
 <file-explorer ng-hide="true"
               url="{{self.fileManager}}" storage-database="self.storageDatabaseAdmin"

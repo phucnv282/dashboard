@@ -1,5 +1,5 @@
 {
-  "name": "base-map",
+  "name": "dashboard",
   "version": "0.0.1",
   "scripts": {
     "local": "webpack --mode=none",
