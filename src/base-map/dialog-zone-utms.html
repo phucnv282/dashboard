@@ -1,0 +1,17 @@
+
+
+    <div class="dialog-header ">
+        <div style="display: flex; align-items: center;">
+            <div class="ti-world" style="color: #3e84ff; font-size: 15px;"></div>
+            <span>UTM Zone</span>
+        </div>
+        <input class="searchInput" type="text" placeholder="Search zone" ng-model="searchProject" />
+        <div class="ti ti-close" ng-click="self.showZone = !self.showZone" style="cursor: pointer;"></div>
+    </div>
+    <div class="dialog-main">
+        <div class="list-zone">
+            <div class="zone" ng-repeat="item in zoneFieldTable | filter:searchProject track by $index" ng-click="hasChanged(item)" ng-class="{'selected-zone': zoneMap == item.output}" ng-hide="item.DisplayName===''">
+                <span ng-bind="item.DisplayName"></span>
+            </div>
+        </div>
+    </div>

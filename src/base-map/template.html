@@ -1,0 +1,577 @@
+
+<div class="dialog-setting slim-scroller" ng-show="self.showZone">
+  ${require('./dialog-zone-utms.html')}
+</div>
+<div class="dialog-setting slim-scroller" ng-show="self.showAxesDialog" style="height: auto;">
+  ${require('./dialog-axes.html')}
+</div>
+<div class="dialog-setting slim-scroller" ng-show="self.showFileDialog" style="height: auto;">
+  ${require('./dialog-file.html')}
+</div>
+<script type="text/ng-template" id="dashboard-template-modal">
+${require('./dashboard-template-modal.html')}
+</script> 
+<div ng-show="self.showGuide && !self.showMap"
+  style="width: calc(100vw - 340px); height: 100vh; right: 0; position: absolute; overflow: hidden; background: #3e84ff; z-index: 3;"
+  class="slim-scroller guide-mobile">
+  <div class="content" style="width: 300px; display: flex; top: 100px; left: 100px; position: absolute;">
+    <div class="icon-clicking"></div>
+    <div style="color: #fff; margin-left: 20px;">
+      <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">
+        Open Dashboard
+      </div>
+      <div>
+        Choose a project to get started.
+      </div>
+      <div ng-click="self.showGuide = !self.showGuide; self.setAllDone(true)"
+        style="display: flex; padding: 10px 20px; border-radius: 20px; border: 2px solid #fff; width: fit-content; align-items: center; margin-top: 40px; cursor: pointer;">
+        <div class="fa fa-check" style="margin-right: 15px;"></div>
+        <div>Done</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="dialog-error" ng-show="self.showError">
+    <div class="dialog-header">
+        <div style="display: flex; align-items: center;">
+            <div class="ti ti-alert" style="color: #ff8503; font-size: 20px;"></div>
+            <span>Warning</span>
+        </div>
+        <div class="ti ti-close" ng-click="self.showError = !self.showError" style="cursor: pointer;"></div>
+    </div>
+    <div class="loading">
+        <div class="loading-bar-error">
+          <span class="bar-animation-error" ng-style="{'animation-duration': self.showingTimeDialogError + 's'}"></span>
+        </div>
+      </div>
+    <div class="dialog-main">
+        <span>
+            {{ message || "Something error" }}
+        </span>
+    </div>
+    
+</div>
+<div class="dialog-error" ng-show="self.wellError">
+  <div class="dialog-header">
+      <div style="display: flex; align-items: center;">
+          <div class="ti alert" style="color: #ff8503; font-size: 20px;"></div>
+          <span>Warning</span>
+      </div>
+      <div class="ti ti-close" ng-click="self.wellError = !self.wellError" style="cursor: pointer;"></div>
+  </div>
+  <div class="loading">
+    <div class="loading-bar-error">
+      <span class="bar-animation-error" ng-style="{'animation-duration': self.showingTimeDialogError + 's'}"></span>
+    </div>
+  </div>
+  <div class="dialog-main">
+      <span>
+          <b>Well: {{self.wellError}}</b><br>
+          Lat Long cannot be converted to UTM or failed to get projected coordinates.
+      </span>
+  </div>
+</div>
+
+<div id="main" class="main slim-scroller" ng-class="{'change-height': self.hideMain}" ng-style="{'width': self.hideMain ? '0px' : '340px'}">
+  <div class="tab" ng-style="{'margin-bottom': !self.showMap ? '20px' : '0'}">
+    <div style="display: flex; align-items: center;">
+
+      <div class="tab-name" ng-class="{'active' : isSet(1)}" ng-click="setTab(1)">
+        Projects
+      </div>
+      <div class="tab-name" ng-class="{'active' : isSet(3)}" ng-click="setTab(3)" ng-show="self.showMap">
+        Wells
+        <span ng-if="wellSelect.length" class="tab-badge">{{wellSelect.length?wellSelect.length:''}}</span>
+      </div>
+      <!--
+      <div class="tab-name" ng-class="{'active' : isSet(4)}" ng-click="setTab(4)">
+        Curves
+        <span ng-if="curveList.length" class="tab-badge">{{curveList.length?curveList.length:''}}</span>
+      </div>
+      -->
+      <div class="tab-name" ng-class="{'active' : isSet(2)}" ng-click="setTab(2)" ng-show="self.showMap">
+        Appearance
+      </div>
+      <div class="tab-name" ng-class="{'active' : isSet(5)}" ng-click="setTab(5)" ng-show="self.showMap">
+        Configs
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div class="tab-name ti ti-angle-left" style="color: #4085ff; font-size: 13px; position: relative; z-index: 1;" ng-click="self.hideMain = !self.hideMain" ></div>
+      <div class="tab-name ti ti-reload" style="color: #4085ff; font-size: 13px; position: relative; z-index: 1;" ng-click="self.refresh()" ng-show="!self.showMap" ></div>
+      <div class="tab-name fa fa-user-circle-o" style="color: #4085ff; font-size: 13px; position: relative; z-index: 1;"
+        ng-click="self.showUser = !self.showUser">
+        <div ng-show="self.showUser" class="user">
+          <wi-login ng-if="self.hasWiLogin" whoami="main-service" app-name="Managerment Dashboard" login-url="{{ self.loginUrl }}"
+            query-string="self.queryString" register-url="https://www.i2g.cloud/register-information/">
+          </wi-login>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-show="self.showLoading" class="loading">
+    <div class="loading-bar">
+      <span class="bar-animation"></span>
+    </div>
+  </div>
+  <div class="tab" style="justify-content: flex-start; padding-left: 5px; border-bottom: none;" ng-show="self.showMap">
+    <div title="Show/Hide dashboard" class="tab-fn" ng-class="{'on': self.showDashboard}" 
+      ng-show="!self.showMap"
+      ng-click="self.openDashboard()">
+      <i class="ti ti-pie-chart"></i>
+    </div>
+    <div title="Show well on map" class="tab-fn" ng-click="self.moveWell()"
+      ng-class="{'inactive' : !isSet(1) || !self.selectedNode}">
+      <i class="ti ti-arrow-right"></i>
+    </div>
+    <div title="Delete wells" class="tab-fn" ng-click="self.deleteWell()" ng-class="{'inactive' : !isSet(3)}">
+      <i class="ti ti-trash"></i>
+    </div>
+    <div title="Clear all the wells on the map" class="tab-fn" ng-click="self.cleanMap()"
+      ng-class="{'inactive' : !isSet(3)}">
+      <i class="ti ti-paint-roller"></i>
+    </div>
+    <div title="Refesh Projects List" class="tab-fn" ng-click="self.refresh()" ng-class="{'inactive' : !isSet(1)}" ng-hide="!isSet(1)">
+      <i class="ti ti-reload"></i>
+    </div>
+    <!-- <div title="Refesh Wells Selected" class="tab-fn" ng-click="self.refeshWellSelect()" ng-class="{'inactive' : !isSet(3)}" ng-show="isSet(3)">
+      <i class="ti ti-reload"></i>
+    </div> -->
+    <div title="Toggle menu" ng-show="!self.hideMain && self.showMap" class="tab-fn"
+      ng-click="self.hideMain = !self.hideMain">
+      <i class="ti ti-angle-up"></i>
+    </div>
+    <div title="Toggle menu" ng-show="self.hideMain && self.showMap" class="tab-fn"
+      ng-click="self.hideMain = !self.hideMain">
+      <i class="ti ti-angle-down"></i>
+    </div>
+    <!-- <div style="display: flex; align-items: center;" ng-show="self.showMap">
+      <div ng-show="self.hideMain" class="tab-name ti ti-arrow-circle-down" style="color: #4085ff; font-size: 12px;"
+        ng-click="self.hideMain = !self.hideMain"></div>
+      <div ng-show="!self.hideMain" class="tab-name ti ti-arrow-circle-up" style="color: #99a3ba; font-size: 12px;"
+        ng-click="self.hideMain = !self.hideMain"></div>
+    </div> -->
+
+  </div>
+  <div ng-show="isSet(1) && !self.hideMain" class="content">
+    <div class="content-top">
+      <div style="height: 100%; overflow: hidden; display: flex; flex-direction: column; flex: 1;">
+        <wi-tree-view-virtual tree-root="treeConfig" get-label="self.getLabel" get-icon="self.getIcon"
+          get-children="self.getChildren" run-match="self.runMatch" hide-unmatched="true" click-fn="self.clickFunction"
+          no-drag="true" node-comparator="self.nodeComparator">
+        </wi-tree-view-virtual>
+      </div>
+    </div>
+    <!-- <div class="content-bottom">
+      <wi-droppable on-drop="(self.dropFn)" style=" display: flex; overflow: hidden;position: absolute;"
+        container-style="{flex: 1, margin: 0, border: 'none', overflow: 'auto'}">
+        <div class="no-wells">
+          <div>
+            <div class="ti ti-import" style="font-size: 40px;
+                        margin-bottom: 20px;
+                        color: #5592ff;"></div>
+            <div>Drop wells here</div>
+          </div>
+        </div>
+      </wi-droppable>
+      <div class="tab-function">
+
+        <div class="tab-fn-name ti ti-close" ng-click="self.deleteWell()"></div>
+        <div class="tab-fn-name ti-paint-roller" ng-click="self.cleanMap()"></div>
+      </div>
+    </div> -->
+
+
+  </div>
+  <div ng-show="isSet(3) && !self.hideMain" class="content" id="isSet3">
+
+    <wi-tree-view-virtual tree-root="wellSelect" get-label="self.getLabel" get-icon="self.getIcon"
+      get-children="self.getChildren" run-match="self.runMatchWell" hide-unmatched="true"
+      selected-ids="self.selectedIdsHash" click-fn="self.clickWellFunction" no-drag="true">
+    </wi-tree-view-virtual>
+  </div>
+  <!--
+  <div ng-show="isSet(4) && !self.hideMain" class="content">
+    <wi-tree-view-virtual tree-root="curveList" get-label="self.getLabel" get-icon="self.getIcon"
+      get-children="self.getChildren" run-match="self.runMatchCurve" hide-unmatched="true" no-drag="true">
+    </wi-tree-view-virtual>
+  </div>
+  -->
+  <div ng-show="isSet(5) && !self.hideMain" class="content">
+    <div style="flex: 1; margin: 15px; user-select: none; overflow: hidden ;display: flex; flex-direction: column;"
+      onmouseover=this.style.overflow='overlay' onmouseout=this.style.overflow='hidden'>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Position</div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span class="setting-sub-title">Choose which position of well to display</span>
+              <div class="setting-content">
+                <select style="width: 100%;border: none; background: none;" ng-model="self.wellPosition">
+                  <option ng-repeat="opt in self.wellPositionOptions" ng-value="opt.value">{{opt.label}}</option>
+                </select>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Display Well Mode</div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span class="setting-sub-title">Choose which icon of well to display</span>
+              <div class="setting-content">
+                <select style="width: 100%;border: none; background: none;" ng-model="self.wellDisplayMode">
+                  <option ng-repeat="opt in self.wellDisplayModeOptions" ng-value="opt.value">{{opt.label}}</option>
+                </select>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Zonesets & markersets</div>
+        <div class="complex-setting" style="margin-bottom: 10px">
+          <div class="setting-content">
+            <span
+              class="setting-sub-title">{{self.showZonesets?"Select a zonation to display":"Display well positions a zonal depth"}}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showZonesets" ng-click="self.toggleZonesets()" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div ng-if="self.showZonesets" class="setting-content"
+            style="margin-top:12px; flex-direction: column; align-items: unset;">
+            <div style="flex-basis: 1.5em; display: flex; justify-content: space-between;">
+              <label ng-repeat="_zoneDepthSpec in zoneDepthSpecs">
+                <input type="radio" ng-model="self.zoneDepthSpec" value="{{_zoneDepthSpec.value}}">&nbsp&nbsp
+                {{_zoneDepthSpec.label}}
+              </label>
+            </div>
+            <wi-tree-view-virtual tree-root="zoneList" get-label="self.getLabel" get-icon="self.getIcon" class="customize-tree-view"
+              click-fn="self.clickZoneFunction" get-children="self.getChildren" run-match="self.runMatchZonesets"
+              hide-unmatched="true" no-drag="true">
+            </wi-tree-view-virtual>
+          </div>
+        </div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span
+              class="setting-sub-title">{{self.showMarkersets?"Select a marker to display":"Display well positions a marker depth"}}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showMarkersets" ng-click="self.toggleMarkersets()" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div ng-if="self.showMarkersets" class="setting-content" style="margin-top:12px;">
+            <wi-tree-view-virtual tree-root="markerList" get-label="self.getLabel" get-icon="self.getIcon" class="customize-tree-view"
+              click-fn="self.clickMarkerFunction" get-children="self.getChildren" run-match="self.runMatchMarkersets"
+              hide-unmatched="true" no-drag="true">
+            </wi-tree-view-virtual>
+          </div>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Show contour</div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span
+              class="setting-sub-title">{{self.showContour?"Pick a curve for contour rendering":"Displays contour layer"}}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showContour" ng-click="self.toggleContour()" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div ng-if="self.showContour" class="setting-content" style="margin-top: 12px;">
+            <span
+              class="setting-sub-title">Show Text Label</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showContourText" ng-click="self.showContourText = !self.showContourText" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div ng-if="self.showContour" class="setting-content" style="margin-top: 12px;">
+            <span
+              class="setting-sub-title">Show Contour Line</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showContourStroke" ng-click="self.showContourStroke = !self.showContourStroke" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div ng-if="self.showContour" class="setting-content" style="margin-top: 12px;">
+            <span class="setting-sub-title">Contour Transparency</span>
+            <input type="number" min="0" max="1" ng-model="self.contourTransparency" step="0.1"/>
+          </div>
+          <div ng-if="self.showContour" class="setting-content" style="margin-top: 12px;">
+            <span class="setting-sub-title">Number Of Contours Line</span>
+            <input type="number" min="1" ng-model="self.contourStep" step="1"/>
+          </div>
+          <div ng-if="self.showContour" class="setting-content" style="margin-top: 12px;">
+            <wi-tree-view-virtual tree-root="curveList" get-label="self.getLabel" get-icon="self.getIcon" class="customize-tree-view"
+              click-fn="self.clickCurveFunction" get-children="self.getChildren" run-match="self.runMatchCurve"
+              hide-unmatched="true" no-drag="true">
+            </wi-tree-view-virtual>
+          </div>
+        </div>
+      </div>
+      <div class="setting">
+        <div>
+          <div class="setting-title">
+            <div>Show zone dialog</div>
+          </div>
+          <div class="setting-content" style="align-items: flex-start;">
+            <span style="line-height: 2;">Zone active:{{ zoneMap }}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showZone" ng-click="self.showZone = !self.showZone" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Show trajectory</div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span
+              class="setting-sub-title">{{self.showTrajectory?"Displaying trajectory":"Displays trajectory layer"}}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showTrajectory" ng-click="self.toggleTrajectory()" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <!--
+          <div ng-if="self.showTrajectory" class="setting-content" style="margin-top: 12px;">
+            <wi-tree-view-virtual tree-root="curveList" get-label="self.getLabel" get-icon="self.getIcon"
+              click-fn="self.clickCurveFunction" get-children="self.getChildren" run-match="self.runMatchCurve"
+              hide-unmatched="true" no-drag="true">
+            </wi-tree-view-virtual>
+          </div>
+          -->
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title" style="margin-bottom: 10px;">Show dialog axes properties </div>
+        <div class="complex-setting">
+          <div class="setting-content">
+            <span
+              class="setting-sub-title">{{self.showAxesDialog?"Displaying Dialog Axes":"Displays Dialog Axes Properties"}}</span>
+            <label class="switch">
+              <input type="checkbox" ng-checked="self.showAxesDialog" ng-click="self.showAxesDialog = !self.showAxesDialog" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="upload">
+        <div class="upload-header">
+          <div>
+            <div style="font-weight: bold; margin-bottom: 10px;">Upload boundary file </div>
+            <span>File type ESRI shape file (zip), geojson. </span>
+          </div>
+          <div class="btn-add" id="map-upfile-1-btn">
+            <span class="ti ti-plus"></span>
+          </div>
+        </div>
+        <div class="upload-content">
+          <p ng-show="false">
+            <input type="file" id="map-upfile-1" class="file-upload" accept=".geojson,application/zip"
+              placeholder="choose a file" onblur="angular.element(this).scope().clearSelectedFile()"
+              onchange="angular.element(this).scope().onFileChange(), angular.element(this).scope().GetFileSizeNameAndType()" />
+          </p>
+          <div id="fp" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-top: 15px;">
+          </div>
+        </div>
+      </div>
+     
+    </div>
+  </div>
+  <div ng-show="isSet(2) && !self.hideMain" class="content">
+    <div style="flex: 1; margin: 15px; user-select: none; overflow: hidden ;display: flex; flex-direction: column;"
+      onmouseover=this.style.overflow='overlay' onmouseout=this.style.overflow='hidden'>
+      <div class="setting" ng-class="{'disable': !self.showMap}">
+        <div class="setting-title">Themes</div>
+        <div class="setting-content">
+          <span>Active theme: {{ self.activeTheme }} </span>
+        </div>
+        <div style="display: flex; margin-top: 10px;justify-content: space-between;" class="theme-list">
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Dark'}"
+            ng-click="self.changeStyleMap(1); self.activeTheme = 'Dark'" class="theme" ng-style="{'background': !self.darkMode ? '#353535' : '#888888'}">
+          </div>
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Standard'}"
+            ng-click="self.changeStyleMap(2); self.activeTheme = 'Standard'" class="theme" ng-style="{'background': !self.darkMode ? '#4CAF50' : '#88a789'}">
+          </div>
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Retro'}"
+            ng-click="self.changeStyleMap(3); self.activeTheme = 'Retro'" class="theme" ng-style="{'background': !self.darkMode ? '#e0d5b3' : '#b7b3a5'}">
+          </div>
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Night'}"
+            ng-click="self.changeStyleMap(4); self.activeTheme = 'Night'" class="theme" ng-style="{'background': !self.darkMode ? '#12448c' : '#7293a0'}">
+          </div>
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Aubergine'}"
+            ng-click="self.changeStyleMap(5); self.activeTheme = 'Aubergine'" class="theme" ng-style="{'background': !self.darkMode ? '#1ea2d8' : '#82b9d0'}">
+          </div>
+          <div ng-class="{'active fa fa-check': self.activeTheme === 'Silver'}"
+            ng-click="self.changeStyleMap(6); self.activeTheme = 'Silver'" class="theme"
+            style="margin-right: 0;" ng-style="{'background': !self.darkMode ? '#cccccc' : '#bdbdbd'}"></div>
+        </div>
+      </div>
+      <div class="setting" ng-class="{'disable': !self.showMap}">
+        <div class="setting-title">Control Panel</div>
+        <div class="setting-content">
+          <span>Show control panel </span>
+          <label class="switch">
+            <input type="checkbox" ng-checked="self.controlPanel" ng-click="self.controlPanel = !self.controlPanel" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="setting" ng-class="{'disable': !self.showMap}">
+        <div class="setting-title">Well's Name</div>
+        <div class="setting-content">
+          <span>Show well's name</span>
+          <label class="switch">
+            <input type="checkbox" ng-checked="allPopup" ng-click="self.allPopup()" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="setting" ng-class="{'disable': !self.showMap}">
+        <div class="setting-title">Mouse Coordinates</div>
+        <div class="setting-content">
+          <span>Show mouse coordinates</span>
+          <label class="switch">
+            <input type="checkbox" ng-checked="self.point" ng-click="self.point = !self.point" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <!-- Disable setting open dashboard from basemap -->
+      <div class="setting" ng-show="!self.showMap">
+      <!-- <div class="setting"> -->
+        <div class="setting-title">Show Dashboard Only</div>
+        <div class="setting-content">
+          <span>Hide map to increase performance</span>
+          <label class="switch">
+            <input type="checkbox" ng-checked="!self.showMap" ng-click="self.showMap = !self.showMap;" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title">Dark mode</div>
+        <div class="setting-content">
+          <span>Dark mode for menu window, dashboard </span>
+          <label class="switch">
+            <input type="checkbox" ng-model="self.darkMode" ng-click="self.toggleDarkMode(); " />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-title">File Manager</div>
+        <div class="setting-content">
+          <span>Load/Save configuration file</span>
+          <label class="switch">
+            <input type="checkbox" ng-checked="self.showFileDialog" ng-click="self.showFileDialog = !self.showFileDialog" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <!-- IMPORTANT: DO NOT DELETE THESE LINE, THIS IS IN DEVELOPPED FEATURES
+      <div class="upload">
+        <div class="upload-header">
+          <div>
+            <div style="font-weight: bold; margin-bottom: 10px;">Open Grid file</div>
+            <span>Upload a grid file.</span>
+          </div>
+          <div class="btn-add" id="map-upfile-2-btn">
+            <span class="ti ti-plus"></span>
+          </div>
+        </div>
+        <div class="upload-content">
+          <p>
+            <input type="file" id="map-upfile-text" class="file-upload" accept="*" placeholder="choose a file .zip"
+              onchange="angular.element(this).scope().onGridFileChange()" />
+          </p>
+          <div id="fp2" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-top: 15px;">
+          </div>
+        </div>
+      </div>
+      -->
+    </div>
+  </div>
+</div>
+<div class="help" ng-click="self.showHelp = !self.showHelp" ng-show="self.showMap">
+  <i class="fa fa-question-circle" style="font-size: 18px;"></i>
+  <div class="help-content" ng-show="self.showHelp">
+    <div class="help-content-row">
+      <div class="well-icon"></div>
+      <span>Undefined</span>
+    </div>
+    <div class="help-content-row">
+      <div class="arrow" style="transform: rotate(180deg);"></div>
+      <span>Production</span>
+    </div>
+    <div class="help-content-row">
+      <div class="search"></div>
+      <span>Exploration</span>
+    </div>
+    <div class="help-content-row" style="border-bottom: 1px solid #e2e2e273; padding-bottom: 25px; margin-bottom: 15px;">
+      <div class="arrow" ></div>
+      <span>Injection</span>
+    </div>
+    <div class="help-content-row">
+      <div class="circle" style="background: #15b153;
+      border: 1px solid #8fd0ac;"></div>
+      <span>Oil</span>
+    </div>
+    <div class="help-content-row">
+      <div class="circle" style="background: #7d7d7d8a;
+      border: 1px solid #cccccc;"></div>
+      <span>Condensate</span>
+    </div>
+    <div class="help-content-row">
+      <div class="circle" style="background: #ff6868;
+      border: 1px solid #ffcece;"></div>
+      <span>Gas</span>
+    </div>
+    <div class="help-content-row">
+      <div class="circle" style="background: #0072ffa6;
+      border: 1px solid #9cd5fd;"></div>
+      <span>Water</span>
+    </div>
+    <div class="help-content-row">
+      <div class="circle" style="background: #585858;
+      border: 1px solid #9c9c9c;"></div>
+      <span>Undefined</span>
+    </div>
+  </div>
+</div>
+<div ng-class="{'show-dashboard': self.showDashboard}" class="dialog">
+  ${require('./dialog-dashboard.html')}
+</div>
+<!-- <map-view 
+  ng-show="self.showMap"
+  class="mapView"
+  mapbox-token="pk.eyJ1IjoicmV2b3RlY2giLCJhIjoiY2swZGJobWg3MDY2NzNtbnVwaDEyYmttMCJ9.39KL2GsNCiew9XmiLVsTDQ"
+  wells="wellSelect" zone-map="zoneMap" focus-well='focusWell' all-popup="allPopup" theme="themeMap"
+  focus-curve="focusCurve" geo-json="self.geoJson"
+  focus-marker-or-zone="focusMZ" zone-depth-spec="self.zoneDepthSpec"
+  get-curve-info-fn="self.getCurveInfoFn" get-curve-raw-data-fn="self.getCurveRawDataFn"
+  show-contour="self.showContour" control-panel="self.controlPanel" deep-ocean="self.deepOcean" point="self.point">
+</map-view>
+-->
+<google-map-view theme="themeMap" ng-if="checkGoogleApi() && self.showMap" all-popup="allPopup" class="mapView"
+  wells="wellSelect" geo-json="self.geoJson" control-panel="self.controlPanel" point="self.point" focus-well='focusWell'
+  focus-curve="focusCurve" show-contour="self.showContour" show-contour-text="self.showContourText"
+  contour-transparency="self.contourTransparency" contour-step="self.contourStep" show-contour-stroke="self.showContourStroke"
+  show-trajectory="self.showTrajectory" show-Axes="self.showAxes"
+  axes-unit="self.axesUnit" axes-x-left="self.XLeft" axes-x-right="self.XRight" axes-y-bottom="self.YBottom" axes-y-top="self.YTop"
+  focus-marker-or-zone="focusMZ" zone-depth-spec="self.zoneDepthSpec" get-curve-info-fn="self.getCurveInfoFn"
+  prepare-well-info-fn="self.prepareWellInfoFn" well-position="self.wellPosition" fit-to-bound="self.fitToBound"
+  get-curve-raw-data-fn="self.getCurveRawDataFn" zone-map="zoneMap" clear-clipboard-focus-well="self.clearClipboardFocusWell"
+  display-mode="self.wellDisplayMode">
+</google-map-view>
+
+<file-explorer ng-hide="true"
+              url="{{self.fileManager}}" storage-database="self.storageDatabaseAdmin"
+              id-project="1" set-container="self.setContainerFileBrowser"
+              preview-url="{{self.previewUrl}}" hide-import-to-inventory="true" is-database="false"
+              hide-action-filter="true" hide-associate="true">
+</file-explorer>

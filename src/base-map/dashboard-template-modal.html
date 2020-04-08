@@ -1,0 +1,39 @@
+<style>
+    .ngdialog-content {
+        animation: unset !important;
+        background: unset !important;
+        box-shadow: unset !important;
+        -webkit-box-shadow: unset !important;
+    }
+</style>
+<!--
+<div ng-if="wiModal.mode === 'new-dashboard'" style="font-size: 1.25em;">
+    <editable style="width: 100%; padding: 0.25em 0.15em;" item-label="'Name'" enabled="true" item-value="wiModal.getValue" set-value="wiModal.setValue"></editable>
+    <button class="btn btn-primary" ng-click="wiModal.saveDashboardTemplate()">OK</button>
+</div>
+<div ng-if="wiModal.mode === 'load-dashboard'" style="font-size: 1.25em;">
+    <label>Select Template</label>
+    <div style="margin: 0.25em 0;">
+        <wi-dropdown-list items="wiModal.options" on-item-changed="wiModal.setValue" current-select="wiModal.getValue()"
+            ctrl-btn-icon="ti ti-close" on-ctrl-btn-click="wiModal.deleteTemplate"
+            on-wi-dropdown-init="wiModal.getDashboardTemplateList" hide-delete-button="false">
+        </wi-dropdown-list>
+    </div>
+    <button class="btn btn-primary" ng-click="wiModal.loadDashboardTemplate()">Load</button>
+</div>
+-->
+<div class="dialog-error" ng-if="wiModal.mode === 'confirm-modal'"
+    style="width: unset; position: unset; margin: unset; top: unset; height: unset; max-height: unset;"
+    >
+  <div class="dialog-header">
+      <div style="display: flex; align-items: center;">
+          <div class="ti-alert" style="color: #ff8503; font-size: 20px;"></div>
+          <span>Confirm</span>
+      </div>
+      <div class="ti ti-close" ng-click="wiModal.closeBtnClicked()" style="cursor: pointer;"></div>
+  </div>
+  <div class="dialog-main">
+    <div>{{wiModal.message}}</div>
+    <button class="btn" style="margin-top: 10px;" ng-click="wiModal.onOkButtonClicked()">OK</button>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="display-dialog slim-scroller">
+    <div class="header-dialog">
+        <div style="display: flex; overflow: hidden;">
+            <div style=" color: #4085ff; font-size: 17px; margin-right: 20px; cursor: pointer;" class="ti ti-align-left" ng-click="self.hideMain = !self.hideMain" ng-show="self.hideMain"> </div>
+            <div style=" color: #4085ff; font-size: 17px; margin-right: 20px;" class="ti ti-pie-chart hide-in-mobile"> </div>
+            <div class="title-dialog"><span class="hide-in-mobile">Dashboard (</span>{{self.dashboardContent.project.alias || self.selectedNode.name}}<span class="hide-in-mobile">)</span> {{self.getNumberOfWells(self.dashboardContent.project)}}</div>
+            
+        </div>
+        <div style="display: flex;">
+            <div ng-style="{'border-bottom': !self.showWellsInfo ? '2px solid #3e84ff' : '2px solid #fff'}" ng-class="{'active': !self.showWellsInfo}" ng-click="self.showWellsInfo = false" style="padding: 14px 10px; cursor: pointer;">Chart</div>
+            <div ng-style="{'border-bottom': self.showWellsInfo ? '2px solid #3e84ff' : '2px solid #fff'}" ng-class="{'active': self.showWellsInfo}" ng-click="self.showWellsInfo = true" style="padding: 14px 10px; cursor: pointer; display: flex; align-items: center;">Table
+                <div class="ti ti-angle-up" style="cursor: pointer; color: #3e84ff; margin-left: 10px;" ng-show="!self.showOptionsWellTab" ng-click="self.showOptionsWellTab = !self.showOptionsWellTab"></div>
+                <div class="ti ti-angle-down" style="cursor: pointer; color: #3e84ff; margin-left: 10px;" ng-show="self.showOptionsWellTab" ng-click="self.showOptionsWellTab = !self.showOptionsWellTab"></div>
+            </div>
+        </div>
+        <div style=" color: #4085ff; font-size: 17px; cursor: pointer;" class="ti ti-more-alt hide-in-desktop" ng-click="self.showBtnMobile = !self.showBtnMobile"></div>
+        <div style="display: flex;" class="hide-in-mobile">
+            <div ng-click="self.loadDashboard()"
+                title="Load Template"
+                style=" color: #2268e2; font-size: 12px; cursor: pointer; margin-left: 20px;" class=" ti ti-import">
+            </div>
+            <div ng-click="self.saveDashboard1()"
+                title="Save Template"
+                style=" color: #2268e2; font-size: 12px; cursor: pointer; margin-left: 20px;" class=" ti ti-save">
+            </div>
+            <div ng-click="self.addDashboard()"
+                title="Add Widget"
+                style=" color: #2268e2; font-size: 12px; cursor: pointer; margin-left: 20px;" class=" ti ti-plus">
+            </div>
+            <div ng-click="self.reloadDashboardData()"
+                title="Reload Dashboard Data"
+                style=" color: #2268e2; font-size: 12px; cursor: pointer; margin-left: 20px;" class=" ti ti-reload">
+            </div>
+            <div ng-click="self.showDashboard = !self.showDashboard" ng-show="self.showMap"
+                title="Close Dashboard"
+                style=" color: #2268e2; font-size: 12px; cursor: pointer; margin-left: 20px;" class=" ti ti-close">
+            </div>
+        </div>
+    </div>
+    <div ng-show="self.showBtnMobile" style="font-size: 15x;display: flex; align-items: center; justify-content: center; height: 70px; border-bottom: 1px solid #0000000d; padding: 0 15px;">
+        <div ng-click="self.loadDashboard()"
+                title="Load Template"
+                style=" color: #2268e2;  cursor: pointer;" class=" ti ti-import">
+            </div>
+            <div ng-click="self.saveDashboard1()"
+                title="Save Template"
+                style=" color: #2268e2; cursor: pointer; margin-left: 40px;" class=" ti ti-save">
+            </div>
+            <div ng-click="self.addDashboard()"
+                title="Add Widget"
+                style=" color: #2268e2; cursor: pointer; margin-left: 40px;" class=" ti ti-plus">
+            </div>
+            <div ng-click="self.reloadDashboardData()"
+                title="Reload Dashboard Data"
+                style=" color: #2268e2;  cursor: pointer; margin-left: 40px;" class=" ti ti-reload">
+            </div>
+            <div ng-click="self.showDashboard = !self.showDashboard" ng-show="self.showMap"
+                title="Close Dashboard"
+                style=" color: #2268e2;  cursor: pointer; margin-left: 40px;" class=" ti ti-close">
+            </div>
+    </div>
+    <div ng-show="self.showLoadingDashboard" class="loading">
+        <div class="loading-bar">
+            <span class="bar-animation"></span>
+        </div>
+    </div>
+    <div class="main-dialog">
+        <div style="width: 100%" class="hide-scroller"  ng-if="!self.showWellsInfo">
+            <manager-dashboard dashboard-content='self.dashboardContent' dashboard-columns="self.dashboardColumns"
+              remove-confirm="true" on-click-chart="self.onClickChart">
+            </manager-dashboard>
+        </div>
+        <div ng-if="self.showWellsInfo" style="overflow: hidden; height: 100%;">
+            <div ui-sortable="self.dashboardTableSortableOptions" ng-model="self.dashboardTableFields"
+                ng-class="{'height0': self.showOptionsWellTab}"
+                style="height: auto; white-space: nowrap; display: flex; flex-wrap: wrap; overflow: hidden; transition: height ease-in 0.2s; background-color: #fff;">
+                <span style="padding: 10px 15px; border-right: 1px solid #f4f4f4; border-bottom: 1px solid #f4f4f4; display: flex; align-items: center;">
+                    <input type="checkbox"
+                        ng-checked="self.isDashboardTableCheckAll()"
+                        ng-click="self.toggleDashboardTableCheckAll()" style="margin: 0 10px 0 0; cursor: pointer">
+                    All
+                </span>
+                <span ng-repeat="field in self.dashboardTableFields" style="cursor: grab; padding: 10px 15px; border-right: 1px solid #f4f4f4; border-bottom: 1px solid #f4f4f4; display: flex; align-items: center;">
+                    <input type="checkbox" ng-model="field.selected" ng-change="self.updateDashboardTableSelectedFields()" style="cursor: pointer;margin: 0 10px 0 0;">
+                    {{ field.field }}
+                </span>
+            </div>
+            <wi-table-resizeable ng-if="self.showDashboardTable" headers='self.dashboardTableHeaders' default-widths='self.dashboardTableDefaultWidths' on-header-width-changed='self.onDashboardTableHeaderWidthChanged' on-table-init='self.onDashboardTableInit'>
+                <div ng-repeat="row in self.dashboardTableRows" class="table-row" 
+                    style="
+                        border-bottom: 1px solid #e6e6e6;
+                        white-space: nowrap;">
+                    <div ng-repeat="cell in row track by $index" class="table-cell" ng-style="{'width': self.dashboardTableWidthArr[$index]}"
+                        style="
+                            display: inline-block;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            padding: .5em .25em;
+                            ">
+                        {{ cell.criteria.getValueFn ? cell.criteria.getValueFn(cell.matched, cell.well) : cell.matched.value }}
+                    </div>
+                </div>
+            </wi-table-resizeable>
+            <div ng-show="!self.showDashboardTable" style="width: 100%; height: 100%; font-size: 40px; text-align: center; margin-top:30vh; color:lightgrey">LOADING...</div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+{
+  "name": "base-map",
+  "version": "0.0.1",
+  "scripts": {
+    "local": "webpack --mode=none",
+    "build-dev": "webpack  --mode=development",
+    "build-prod": "webpack --mode=production",
+    "start": "webpack -w --mode=development"
+  },
+  "devDependencies": {
+    "css-loader": "^2.1.1",
+    "file-loader": "^4.0.0",
+    "hard-source-webpack-plugin": "^0.13.1",
+    "html-loader": "^0.5.5",
+    "image-webpack-loader": "^5.0.0",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.34.0",
+    "webpack-cli": "^3.3.4"
+  },
+  "dependencies": {
+    "babel-loader": "^8.0.6",
+    "file-saver": "^2.0.2",
+    "jszip": "^3.2.2",
+    "query-string": "^6.7.0",
+    "url-loader": "^2.0.0"
+  }
+}

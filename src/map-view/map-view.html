@@ -1,0 +1,103 @@
+<style>
+    .coordinates {
+        background: #fff;
+        color: #333;
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        padding: 0 20px;
+        margin: 0;
+        font-size: 12px;
+        line-height: 18px;
+        border-radius: 5px;
+        display: block;
+        box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.03);
+    }
+
+    .calculation-box {
+        display: none;
+        height: 64px;
+        width: 212px;
+        position: absolute;
+        bottom: 70px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 11px;
+        padding: 5px 10px;
+        text-align: center;
+    }
+
+    p {
+        font-family: Roboto, Arial !important;
+        margin: 0;
+        font-size: 13px;
+    }
+    #contour-map-container {
+        opacity: 0.6;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        pointer-events: none;
+        overflow: hidden;
+    }
+</style>
+<div id="map"></div>
+<div id="contour-map-container"> </div>
+<div class="controlPanel">
+    <div class='coordinates' style="bottom: 90px;">
+        <div style="display: flex;">
+            <div
+                style="display: flex; align-items: center; min-width: 100px;justify-content: space-between;border-right: 1px solid #ccc;    padding: 10px 20px 10px 0;">
+                <span><b>Width</b></span>
+                <div id="displayX"></div><span>px</span>
+            </div>
+            <div
+                style="display: flex; align-items: center; min-width: 80px;justify-content: space-between; margin-left: 20px;">
+                <span><b>Height</b></span>
+                <div id="displayY"></div><span>px</span>
+            </div>
+
+        </div>
+    </div>
+    <div class='coordinates'>
+        <div style="display: flex;">
+            <div
+                style="display: flex; align-items: center; min-width: 110px;justify-content: space-between; border-right: 1px solid #ccc;    padding: 10px 20px 10px 0; ">
+                <span><b>Latitude</b></span>
+                <div id="latPoint"></div>
+            </div>
+            <div
+                style="display: flex; align-items: center; min-width: 110px;justify-content: space-between; margin-left: 20px;">
+                <span><b>Longtitude</b></span>
+                <div id="lngPoint"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class='calculation-box'>
+    <div id='calculated-area'></div>
+</div>
+<script type="text/ng-template" id="templateError">
+    <style>
+            .ngdialog.ngdialog-theme-default .ngdialog-content {
+                width: 300px;
+                border-radius: 2px;
+                padding: 20px;
+            }
+            .newDialog {
+                flex-direction: column;
+            }
+            .newDialog > div {
+                
+            }
+    </style>
+    <div class="ngdialog-buttons">
+        <div class="newDialog">
+            <div style="display: flex;align-items: center;">
+                <i class="connection-error-wi-python-32x32" style="margin-right: 20px; color: #0074c5;font-size: 25px;"></i>
+            </div>
+           <div>{{ message || 'Well coordinate has problems' }}</div>
+        </div>
+    </div>
+</script>

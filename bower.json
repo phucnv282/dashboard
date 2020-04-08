@@ -1,0 +1,39 @@
+{
+  "name": "base-map",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Hung <hungnk1996@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/tunghoang/base-map",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.7.8",
+    "bootstrap-css": "^3.3.7",
+    "font-awesome": "4",
+    "jquery-ui": "^1.12.1",
+    "katex": "^0.10.1",
+    "lodash": "^4.17.11",
+    "misc-component": "https://github.com/tunghoang/misc-component.git",
+    "async": "^2.6.2",
+    "mapbox-box-draw.js": "mapbox-gl-draw#^0.19.0",
+    "themify-icons": "^0.1.2",
+    "angular-resizable": "^1.2.0",
+    "d3": "^5.12.0",
+    "d3-contour.v1.min": "https://d3js.org/d3-contour.v1.min.js",
+    "d3-hsv.v0.1.min": "https://d3js.org/d3-hsv.v0.1.min.js",
+    "shp": "^3.4.3",
+    "file-explorer": "https://github.com/hoangbdUET/file-browser-angular.git"
+  },
+  "resolutions": {
+    "angular": "1.7.9",
+    "jquery": "3.4.1"
+  }
+}
