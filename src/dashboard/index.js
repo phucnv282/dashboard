@@ -14,6 +14,11 @@ if (process.env.NODE_ENV === "development") {
 URL_CONFIG = require("../../config/default").production;
 
 
+function getClientId(owner, prjName) {
+	if (!owner || !owner.length) return "WI_DASHBOARD";
+	return `WI_DASHBOARD-${owner}-${prjName}`; 
+}
+
 // console.log("config", config);
 // console.log("NODE_ENV", process.env.NODE_ENV);
 const WI_AUTH_HOST = URL_CONFIG.wi_auth;
@@ -834,7 +839,8 @@ function baseMapController(
 
   this.reloadDashboardData = function() {
     self.showLoadingDashboard = true;
-    wiApi.getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null)
+    wiApi.client(getClientId(self.selectedNode.owner, self.selectedNode.name))
+      .getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null)
     .then((prjTree) => {
       result = groupWells(prjTree);
       Object.assign(CHART_DATA_SOURCE, result)
@@ -874,7 +880,8 @@ function baseMapController(
     if (!config) return;
     const widgetConfigs = config.widgets;
     self.showLoadingDashboard = true;
-    wiApi.getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
+    wiApi.client(getClientId(self.selectedNode.owner, self.selectedNode.name))
+      .getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
       projectTree = prjTree;
       let result = groupWells(prjTree);
       Object.assign(CHART_DATA_SOURCE, result)
@@ -1059,7 +1066,8 @@ function baseMapController(
 
   this.addDashboard = function () {
     self.showLoadingDashboard = true;
-    wiApi.getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
+    wiApi.client(getClientId(self.selectedNode.owner, self.selectedNode.name))
+      .getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
       projectTree = prjTree;
       let result = groupWells(projectTree);
       Object.assign(CHART_DATA_SOURCE, result)
@@ -1142,14 +1150,15 @@ function baseMapController(
         .then(() => {
           self.showGuide = false;
           self.showLoadingDashboard = true;
-          wiApi.getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
-            projectTree = prjTree;
-            buildDashboard(projectTree);
-          }).catch((e) => {
-            console.error(e);
-          }).finally(() => {
-            self.showLoadingDashboard = false;
-          });
+          wiApi.client(getClientId(self.selectedNode.owner, self.selectedNode.name))
+            .getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
+              projectTree = prjTree;
+              buildDashboard(projectTree);
+            }).catch((e) => {
+              console.error(e);
+            }).finally(() => {
+              self.showLoadingDashboard = false;
+            });
         })
         .catch(() => {
           // reject modal
@@ -1164,14 +1173,15 @@ function baseMapController(
     } else {
       self.showGuide = false;
       self.showLoadingDashboard = true;
-      wiApi.getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
-        projectTree = prjTree;
-        buildDashboard(projectTree);
-      }).catch((e) => {
-        console.error(e);
-      }).finally(() => {
-        self.showLoadingDashboard = false;
-      });
+      wiApi.client(getClientId(self.selectedNode.owner, self.selectedNode.name))
+        .getFullInfoPromise(self.selectedNode.idProject, self.selectedNode.owner, self.selectedNode.owner ? self.selectedNode.name : null).then((prjTree) => {
+          projectTree = prjTree;
+          buildDashboard(projectTree);
+        }).catch((e) => {
+          console.error(e);
+        }).finally(() => {
+          self.showLoadingDashboard = false;
+        });
     }
   }
 
@@ -2255,12 +2265,13 @@ function baseMapController(
         for (let index = 0; index < self.projectList.length; index++) {
           let element = self.projectList[index];
           if(element.owner){
-            wiApi.getFullInfoPromise(element.idProject, element.owner, element.owner ? element.name : null).then((data) => {
-              console.log(data);
-              console.log('---------------------------------------')
-            }).catch((e) => {
-              console.error(e);
-            })
+            wiApi.client(getClientId(element.owner, element.name))
+              .getFullInfoPromise(element.idProject, element.owner, element.owner ? element.name : null).then((data) => {
+                console.log(data);
+                console.log('---------------------------------------')
+              }).catch((e) => {
+                console.error(e);
+              })
           } else if (!element.owner){
             wiApi.getListWells(element.idProject).then((data) => {
               console.log(data);
@@ -2343,7 +2354,8 @@ function baseMapController(
   
         }, function(item) {
           console.log(item);
-          wiApi.getFullInfoPromise(item.idProject)
+            wiApi.client(getClientId(item.owner, item.name))
+              .getFullInfoPromise(item.idProject)
           .then(async (res) => {
             console.log(res);
             var sd = res.storage_databases[0];
@@ -2390,7 +2402,7 @@ function baseMapController(
           selectionList: list
         }, function(item) {
           console.log(item);
-          wiApi.getFullInfoPromise(item.idProject)
+          wiApi.client(getClientId(item.owner, item.name)).getFullInfoPromise(item.idProject)
           .then((res) => {
             console.log(res);
             var sd = res.storage_databases[0];
