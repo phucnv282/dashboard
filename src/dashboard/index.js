@@ -1263,24 +1263,10 @@ function baseMapController(
       for (let wh of wellHeaders) {
         const key = wh.header;
         if (!dataSources.includes(key)) continue;
-        const value = (!wh.value || !wh.value.length) ? "Unknown" : wh.value;
+        // const value = (!wh.value || !wh.value.length) ? "Unknown" : wh.value;
+        const value = (!wh.value || !wh.value.length) ? "UNKNOWN" : `${wh.value}`.toUpperCase();
         result[key][value] = result[key][value] || [];
         result[key][value].push(well);
-        /*
-        let value = (!wh.value || !wh.value.length) ? "Unknown" : wh.value;
-        if (wh.header === "WTYPE") {
-          wTypes[value] = wTypes[value] || [];
-          wTypes[value].push(well);
-        }
-        else if (wh.header === "FLD") {
-          fields[value] = fields[value] || [];
-          fields[value].push(well);
-        }
-        else if (wh.header === "OPERATOR") {
-          operators[value] = operators[value] || [];
-          operators[value].push(well);
-        }
-        */
       }
 
       if (well.relatedTo && well.relatedTo.tags && well.relatedTo.tags.length) {
