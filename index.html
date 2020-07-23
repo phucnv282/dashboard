@@ -72,38 +72,6 @@
     angular
       .module("myApp", ["dashboard", "wiMapLoading", "wiToken"])
       .controller('myController', function ($scope, $http, wiToken, wiApi) {
-        $scope.$watch(
-          function () { return wiToken.getToken(); },
-          function () {
-            // reset base_url if got new token
-            // => to invoke doinit function in wiApi service
-            /*
-            if(wiToken.getToken() && wiToken.getToken() !== "")
-              wiApi.setBaseUrl('https://api-1.i2g.cloud');
-            */
-
-            $http({
-              method: "POST",
-              url: `https://users.i2g.cloud/keys/gcp-key`,
-              data: {},
-              headers: {
-                Authorization: wiToken.getToken()
-              }
-            }).then(
-              function (response) {
-                $scope.apikey = String('https://maps.googleapis.com/maps/api/js?key=' + response.data.content.key);
-                var script = document.createElement('script');
-                script.onload = function () { };
-                script.src = $scope.apikey;
-                document.body.appendChild(script);
-              },
-              function (errorResponse) {
-                console.error(errorResponse);
-                wiToken.removeToken();
-              }
-            );
-          }
-        );
       });
   </script>
 </body>

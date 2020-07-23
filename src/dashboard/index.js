@@ -1,9 +1,11 @@
+// vim: ts=2 sw=2
 var componentName = "dashboard";
 module.exports.name = componentName;
 require("./style.less");
 const queryString = require("query-string");
 const JSZip = require("jszip");
 const fileSaver = require("file-saver");
+const {wiLogin} = require("@revotechuet/misc-component-vue");
 
 let URL_CONFIG = require("../../config/default").default;
 if (process.env.NODE_ENV === "development") {
@@ -12,6 +14,7 @@ if (process.env.NODE_ENV === "development") {
   URL_CONFIG = require("../../config/default").production;
 }
 URL_CONFIG = require("../../config/default").production;
+localStorage.setItem('AUTHENTICATION_HOME', URL_CONFIG['AUTHENTICATION_HOME']);
 
 
 function getClientId(owner, prjName) {
@@ -26,6 +29,7 @@ const WI_BACKEND_HOST = URL_CONFIG.wi_backend;
 const BASE_URL = WI_BACKEND_HOST;
 
 localStorage.setItem('__BASE_URL', WI_AUTH_HOST);
+localStorage.setItem('BASE_URL', WI_AUTH_HOST);
 
 var app = angular.module(componentName, [
   "sideBar",
@@ -325,6 +329,11 @@ function baseMapController(
   };
   $scope.checkGoogleApi = function () {
     return window.google;
+  }
+
+  self.userInfo = {
+    username: undefined,
+    company: undefined
   }
 
   $('#map-upfile-1-btn').bind("click", function () {
@@ -1355,7 +1364,12 @@ function baseMapController(
     }
   }
 
+  this.logout = () => {
+    wiLogin.logout({redirectUrl: window.location.origin});
+  }
+
   this.$onInit = function () {
+    wiLogin.doLogin({redirectUrl: window.location.origin});
     self.showDialog = false;
     self.loginUrl = `${WI_AUTH_HOST}/login` || $location.search().loginUrl || self.loginUrl;
     self.queryString = queryString.parse(location.search);
@@ -1412,6 +1426,11 @@ function baseMapController(
           getZoneList();
           getCurveTree();
           wiApi.setBaseUrl(BASE_URL);
+
+          setTimeout(() => {
+            self.userInfo.username = window.localStorage.getItem('username');
+            self.userInfo.company = JSON.parse(window.localStorage.getItem('company'));
+          })
         }
       }
     );
@@ -1438,7 +1457,7 @@ function baseMapController(
   function getZoneList() {
     $http({
       method: "POST",
-      url: `${WI_BACKEND_HOST}/utm-zones`,
+      url: `${WI_BACKEND_HOST}/utm-zones?service=WI_BACKEND`,
       data: {},
       headers: {}
     }).then(
