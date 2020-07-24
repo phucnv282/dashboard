@@ -93,7 +93,7 @@ ${require('./dashboard-template-modal.html')}
         ng-click="self.showUser = !self.showUser">
         <div ng-show="self.showUser" class="user">
           <div style="color: white">
-            {{ self.userInfo.company.name }}/{{ self.userInfo.username }}
+            {{ self.getUserCompanyName() }}/{{ self.getUserName() }}
           </div>
           <div>
             <button ng-click="self.logout()">Logout</button>

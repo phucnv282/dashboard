@@ -5,7 +5,8 @@ require("./style.less");
 const queryString = require("query-string");
 const JSZip = require("jszip");
 const fileSaver = require("file-saver");
-const {wiLogin} = require("@revotechuet/misc-component-vue");
+const {wiLogin, WiApi} = require("@revotechuet/misc-component-vue");
+const wiApi = WiApi;
 
 let URL_CONFIG = require("../../config/default").default;
 if (process.env.NODE_ENV === "development") {
@@ -42,7 +43,7 @@ var app = angular.module(componentName, [
   "wiToken",
   "angularResizable",
   'managerDashboard',
-  'wiApi',
+  // 'wiApi',
   'file-explorer',
   'wiDialog'
 ]);
@@ -273,7 +274,7 @@ function baseMapController(
   $timeout,
   $location,
   ngDialog,
-  wiApi,
+  // wiApi,
   wiDialog,
   chartDataSource,
   Upload
@@ -329,11 +330,6 @@ function baseMapController(
   };
   $scope.checkGoogleApi = function () {
     return window.google;
-  }
-
-  self.userInfo = {
-    username: undefined,
-    company: undefined
   }
 
   $('#map-upfile-1-btn').bind("click", function () {
@@ -1368,8 +1364,11 @@ function baseMapController(
     wiLogin.logout({redirectUrl: window.location.origin});
   }
 
-  this.$onInit = function () {
-    wiLogin.doLogin({redirectUrl: window.location.origin});
+  this.getUserCompanyName = () => JSON.parse(window.localStorage.getItem("company") || "{}").name;
+  this.getUserName = () => window.localStorage.getItem("username");
+
+  this.$onInit = async function () {
+    await wiLogin.doLogin({redirectUrl: window.location.origin});
     self.showDialog = false;
     self.loginUrl = `${WI_AUTH_HOST}/login` || $location.search().loginUrl || self.loginUrl;
     self.queryString = queryString.parse(location.search);
@@ -1425,12 +1424,7 @@ function baseMapController(
         if (localStorage.getItem("token") !== null) {
           getZoneList();
           getCurveTree();
-          wiApi.setBaseUrl(BASE_URL);
-
-          setTimeout(() => {
-            self.userInfo.username = window.localStorage.getItem('username');
-            self.userInfo.company = JSON.parse(window.localStorage.getItem('company'));
-          })
+          // wiApi.setBaseUrl(BASE_URL);
         }
       }
     );
