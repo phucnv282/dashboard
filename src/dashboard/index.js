@@ -4,6 +4,7 @@ require("./style.less");
 const queryString = require("query-string");
 const JSZip = require("jszip");
 const fileSaver = require("file-saver");
+const { wiid: genWiid} = require('@revotechuet/misc-component-vue');
 
 let URL_CONFIG = require("../../config/default").default;
 if (process.env.NODE_ENV === "development") {
@@ -11,12 +12,10 @@ if (process.env.NODE_ENV === "development") {
 } else if (process.env.NODE_ENV === "production") {
   URL_CONFIG = require("../../config/default").production;
 }
-URL_CONFIG = require("../../config/default").production;
-
 
 function getClientId(owner, prjName) {
 	if (!owner || !owner.length) return "WI_DASHBOARD";
-	return `WI_DASHBOARD-${owner}-${prjName}`; 
+	return `WI_DASHBOARD-${owner}-${prjName}`;
 }
 
 // console.log("config", config);
@@ -96,8 +95,8 @@ const chartTypes = [
   { data: { label: "Horizontal Bar" }, properties: { value: "horizontal-bar" } },
   { data: { label: "Pie" }, properties: { value: "pie" } },
   { data: { label: "Doughnut" }, properties: { value: "doughnut" } }
-] 
-const CHART_DATA_SOURCE = {} 
+]
+const CHART_DATA_SOURCE = {}
 app.value('chartSettings', {
   chartTypeOpt: {
     type: 'select',
@@ -275,6 +274,14 @@ function baseMapController(
   Upload
 ) {
   let self = this;
+  wiApi.setBaseUrl(BASE_URL)
+  // overide $http to include wiid
+  const _$http = $http;
+  $http = (config) => _$http({
+    params: {
+      wiid: genWiid(config.data, wiToken.getToken())
+    },
+    ...config});
   window._basemap = self;
   window.$scope = $scope
   self.noWell = true;
@@ -543,7 +550,7 @@ function baseMapController(
   $scope.onZipFileChange = function () {
     // const files = $element.find("input.file-upload")[1].files;
     const files = $element.find("input#map-upfile-2")[0].files;
-  
+
     console.log(files);
     const file = files[0];
     if (file) {
@@ -597,7 +604,7 @@ function baseMapController(
                           headers: {
                             Authorization: wiToken.getToken()
                           }
-                        })  
+                        })
                     .then((res) => {
                       console.log(res)
                       project = res.data.content;
@@ -644,7 +651,7 @@ function baseMapController(
               self.showContour = data.showContour;
               self.showTrajectory = data.showTrajectory;
               self.showAxes = data.showAxes;
-              self.wellPosition = data.wellPosition; 
+              self.wellPosition = data.wellPosition;
               self.darkMode = data.darkMode;
               setDarkMode(self.darkMode);
               self.showZonesets = data.showZonesets;
@@ -754,7 +761,7 @@ function baseMapController(
       this.mode = "load-dashboard";
       this.selectedNode = null;
       this.options = [];
-      
+
       httpPost("/managementdashboard/list", {})
         .then(res => {
           if (!res || !res.data.content.length) {
@@ -799,7 +806,7 @@ function baseMapController(
           wiDialog.promptListDialog(config, function(selectItem) {
             console.log(selectItem);
             resolve(angular.copy(selectItem.content));
-            
+
           });
         });
     })
@@ -1145,7 +1152,7 @@ function baseMapController(
       if (self.selectedNode.idProject == self.dashboardContent.project.idProject) {
         self.reloadDashboardData();
         return;
-      } 
+      }
       confirmDialog("Changes you made may not be saved. Are you sure to switch project?")
         .then(() => {
           self.showGuide = false;
@@ -1329,7 +1336,7 @@ function baseMapController(
   this.toggleZonesets = function () {
     self.showZonesets = !self.showZonesets;
     if (self.showZonesets && self.showMarkersets) {
-      // clear previous marker set state 
+      // clear previous marker set state
       delete $scope.focusMZ;
       clearTreeState('markerList');
 
@@ -1349,7 +1356,7 @@ function baseMapController(
 
       self.showZonesets = false;
     } else if (!self.showMarkersets) {
-      // clear previous marker set state 
+      // clear previous marker set state
       delete $scope.focusMZ;
       clearTreeState('markerList');
     }
@@ -1359,7 +1366,7 @@ function baseMapController(
     self.showDialog = false;
     self.loginUrl = `${WI_AUTH_HOST}/login` || $location.search().loginUrl || self.loginUrl;
     self.queryString = queryString.parse(location.search);
-    self.setDashboardMode = "true"; 
+    self.setDashboardMode = "true";
     self.queryString.token ? (() => { wiToken.setToken(self.queryString.token);  wiToken.saveToken(self.queryString)})() : null
     if(self.setDashboardMode === "true"){
       self.showMap = false;
@@ -1505,7 +1512,7 @@ function baseMapController(
       self.selectedIdsHash = {};
       $scope.focusWell.length = 0;
     })
-		
+
     updateCurveList()
       .then(updateZoneList)
       .then(updateMarkerList);
@@ -1696,7 +1703,7 @@ function baseMapController(
           .sort((a, b) => a - b)
           .reverse()
           .forEach(msi => _markersets.splice(msi, 1));
-        
+
         _markersets.sort((msa, msb) => msa.name.localeCompare(msb.name))
       }
     })
@@ -2007,9 +2014,9 @@ function baseMapController(
     if(!self.showMap){
       self.openDashboard();
     }
-			
+
     if (!$event.shiftKey && !$event.ctrlKey && !$event.metaKey) {
-			
+
 			for (const project of $scope.treeConfig) {
 
 				const wells = project.wells || []
@@ -2266,7 +2273,7 @@ function baseMapController(
               console.error(e);
             })
           }
-  
+
         }
       }
     )
@@ -2325,7 +2332,7 @@ function baseMapController(
           return {
             data: {
               label: e.alias || e.name
-            },  
+            },
             icon: "project-normal-16x16",
             properties: e
           }
@@ -2337,7 +2344,7 @@ function baseMapController(
           iconBtn: "project-normal-16x16",
           hideButtonDelete: true,
           selectionList: list
-  
+
         }, function(item) {
           console.log(item);
             wiApi.client(getClientId(item.owner, item.name))
@@ -2374,7 +2381,7 @@ function baseMapController(
           return {
             data: {
               label: e.alias || e.name
-            },  
+            },
             icon: "project-normal-16x16",
             properties: e
           }
@@ -2457,7 +2464,7 @@ function baseMapController(
                                   headers: {
                                     Authorization: wiToken.getToken()
                                   }
-                                })  
+                                })
                             .then((res) => {
                               console.log(res)
                               project = res.data.content;
