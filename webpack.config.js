@@ -29,6 +29,7 @@ module.exports = {
 				options: {
           esModule: false,
 					sources: false,
+					minimize: false,
 					preprocessor: processNestedHtml,
 				}
 			}]
